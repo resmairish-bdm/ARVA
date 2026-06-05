@@ -1,0 +1,930 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1a2d4f;--gold:#c8973a;--light-gold:#f5e9d0;--cream:#fdfcf8;
+  --border:#d4c9b0;--text:#2c2c2a;--muted:#6b6860;--surface:#f0ece4;
+  --white:#ffffff;--success:#2d6a4f;--danger:#8b2020;
+}
+body{font-family:Arial,sans-serif;background:var(--surface);color:var(--text);font-size:11px;line-height:1.5}
+.app{display:flex;flex-direction:column;height:100vh;min-height:600px}
+.topbar{background:var(--navy);color:white;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:12px}
+.logo-mark svg{width:40px;height:40px}
+.brand-text h1{font-size:15px;font-weight:700;letter-spacing:.5px;color:#fff;line-height:1.1;font-family:Arial,sans-serif}
+.brand-text p{font-size:10px;color:rgba(255,255,255,.55);letter-spacing:.4px;margin-top:1px;font-family:Arial,sans-serif}
+.topbar-actions{display:flex;gap:8px}
+.btn{font-family:Arial,sans-serif;font-size:11px;font-weight:700;padding:6px 13px;border-radius:4px;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s,transform .1s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--gold);color:var(--navy)}
+.btn-primary:hover{opacity:.9}
+.btn-outline{background:transparent;color:white;border:1.5px solid rgba(255,255,255,.35)}
+.btn-outline:hover{background:rgba(255,255,255,.1)}
+.btn-sm{font-size:11px;padding:5px 11px}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:300px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.preview-pane{flex:1;overflow-y:auto;background:var(--surface);padding:20px}
+.section-nav{padding:9px 13px;border-bottom:1px solid var(--border)}
+.section-nav p{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.nav-step{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:4px;cursor:pointer;font-size:11px;color:var(--muted);transition:background .1s}
+.nav-step:hover,.nav-step.active{background:var(--light-gold);color:var(--navy)}
+.nav-step .dot{width:18px;height:18px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;color:var(--muted)}
+.nav-step.active .dot{background:var(--navy);color:white}
+.db-strip{background:#eef3fa;border-bottom:1px solid #c5d4e8;padding:9px 13px;flex-shrink:0}
+.db-strip-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:5px}
+.db-strip-row{display:flex;gap:5px;align-items:center}
+.db-strip input[type=text]{flex:1;border:1px solid #c5d4e8;border-radius:3px;padding:5px 7px;font-size:11px;font-family:Arial,sans-serif;color:var(--text);background:white}
+.db-strip input[type=text]:focus{outline:none;border-color:var(--navy)}
+.db-status{font-size:10px;margin-top:4px;color:var(--muted)}
+.db-status.ok{color:var(--success);font-weight:700}
+.db-status.err{color:var(--danger);font-weight:700}
+.db-drop{width:100%;margin-top:6px;border:1.5px dashed #c5d4e8;border-radius:4px;padding:8px;text-align:center;cursor:pointer;background:white;transition:border .2s;position:relative}
+.db-drop:hover{border-color:var(--navy)}
+.db-drop p{font-size:10px;color:var(--muted);pointer-events:none}
+.db-drop strong{display:block;font-size:11px;color:var(--navy);margin-bottom:2px;pointer-events:none}
+.db-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.form-panels{flex:1;overflow-y:auto}
+.form-panel{display:none;padding:12px}
+.form-panel.active{display:block}
+.form-panel h3{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--gold);text-transform:uppercase;letter-spacing:.4px}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--border);border-radius:3px;padding:5px 8px;font-family:Arial,sans-serif;font-size:11px;color:var(--text);background:var(--cream);transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--navy)}
+.field textarea{resize:vertical;min-height:90px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.member-card{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:9px;margin-bottom:8px;position:relative}
+.member-card .member-num{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.remove-btn{position:absolute;top:7px;right:7px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px}
+.remove-btn:hover{color:var(--danger)}
+.add-member-btn{width:100%;background:var(--light-gold);border:1px dashed var(--gold);border-radius:4px;padding:7px;font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:var(--navy);cursor:pointer;margin-top:3px}
+.add-member-btn:hover{background:#f0ddb5}
+.panel-footer{padding:9px 13px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:6px;flex-shrink:0}
+.panel-nav-btn{font-family:Arial,sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--white);color:var(--text)}
+.panel-nav-btn.next{background:var(--navy);color:white;border-color:var(--navy)}
+.chip-assist{font-size:11px;padding:4px 9px;background:var(--light-gold);border:none;border-radius:10px;cursor:pointer;font-family:Arial,sans-serif;color:var(--navy);font-weight:700;margin-top:5px;display:inline-block}
+.chip-assist:hover{background:#e8d098}
+
+/* ---- Attachment panel ---- */
+.attach-zone{border:2px dashed var(--gold);border-radius:6px;padding:14px;text-align:center;background:var(--light-gold);cursor:pointer;position:relative;transition:border .2s}
+.attach-zone:hover{border-color:var(--navy)}
+.attach-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.attach-zone strong{display:block;font-size:12px;color:var(--navy);margin-bottom:3px}
+.attach-zone p{font-size:10px;color:var(--muted)}
+.attach-list{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.attach-item{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:7px 9px;display:flex;align-items:center;gap:7px;font-size:11px}
+.attach-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--navy);font-weight:700}
+.attach-item-size{color:var(--muted);font-size:10px;flex-shrink:0}
+.attach-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;flex-shrink:0;padding:0 3px}
+.attach-remove:hover{color:var(--danger)}
+.attach-note{font-size:10px;color:var(--muted);margin-top:8px;padding:7px 9px;background:#fff8ec;border:1px solid var(--gold);border-radius:4px;line-height:1.6}
+
+/* ============ REPORT STYLES ============ */
+.report-wrapper{
+  background:white;max-width:720px;margin:0 auto;
+  border:1px solid #bbb;box-shadow:0 2px 12px rgba(0,0,0,.08);
+  font-family:Arial,sans-serif;color:#000;font-size:11px;
+}
+.report-header{padding:22px 40px 14px;text-align:center;border-bottom:2.5px double #000}
+.report-header h2{font-family:Arial,sans-serif;font-size:16px;letter-spacing:8px;color:#000;font-weight:700;text-transform:uppercase}
+.report-body{padding:16px 40px 20px}
+.rpt-section-title{
+  font-family:Arial,sans-serif;font-size:14px;font-weight:700;
+  color:#000;margin:14px 0 7px;text-transform:uppercase;letter-spacing:.2px;
+}
+.rpt-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 24px;margin-bottom:14px}
+.rpt-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#333;font-family:Arial,sans-serif}
+.rpt-value{
+  font-size:11px;color:#000;border-bottom:1px solid #aaa;
+  padding-bottom:2px;min-height:17px;font-family:Arial,sans-serif;
+  word-break:break-word;white-space:normal;
+}
+.rpt-table{width:100%;border-collapse:collapse;margin-bottom:14px;table-layout:fixed}
+.rpt-table th{
+  background:#1a2d4f;color:white;padding:5px 5px;
+  text-align:left;font-weight:700;font-size:11px;font-family:Arial,sans-serif;
+  word-wrap:break-word;
+}
+.rpt-table td{
+  padding:4px 5px;border-bottom:1px solid #ddd;
+  font-size:11px;font-family:Arial,sans-serif;
+  word-wrap:break-word;white-space:normal;overflow-wrap:break-word;
+}
+.rpt-table tr:nth-child(even){background:#f7f7f4}
+
+/* TEXT BOXES — justified alignment */
+.rpt-text-box{
+  border:1px solid #999;
+  padding:10px 11px;
+  font-size:11px;
+  line-height:1.75;
+  min-height:60px;
+  color:#111;
+  margin-bottom:14px;
+  font-family:Arial,sans-serif;
+  word-break:break-word;
+  white-space:pre-wrap;
+  overflow-wrap:break-word;
+  overflow:visible;
+  width:100%;
+  text-align:justify;
+  text-justify:inter-word;
+}
+
+.rpt-sig-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:40px;
+  margin-top:24px;
+  page-break-inside:avoid;
+  break-inside:avoid;
+}
+.rpt-sig-label{font-size:11px;font-weight:700;font-family:Arial,sans-serif;color:#000;margin-bottom:2px}
+.rpt-sig-line{border-top:1.5px solid #000;margin-top:44px;margin-bottom:4px}
+.rpt-sig-name{font-weight:700;font-size:11px;color:#000;text-transform:uppercase;letter-spacing:.3px;font-family:Arial,sans-serif;word-break:break-word}
+.rpt-sig-position{font-size:11px;color:#333;margin-top:2px;font-family:Arial,sans-serif}
+.ph{color:#aaa;font-style:italic}
+.badge-status{display:inline-block;padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}
+.badge-active{background:#d1e7dd;color:#0f5132}
+.badge-movout{background:#f8d7da;color:#6b1c23}
+.badge-inactive{background:#fff3cd;color:#856404}
+
+/* Attachment page separator in preview */
+.attach-page-separator{
+  max-width:720px;margin:16px auto 0;
+  border:1px solid #bbb;
+  background:#f0ece4;
+  display:flex;align-items:center;justify-content:center;
+  gap:10px;padding:8px 20px;
+  font-family:Arial,sans-serif;font-size:11px;color:var(--muted);
+}
+.attach-page{
+  background:white;max-width:720px;margin:4px auto 0;
+  border:1px solid #bbb;box-shadow:0 2px 12px rgba(0,0,0,.08);
+  min-height:200px;overflow:hidden;
+}
+.attach-page-header{
+  background:#1a2d4f;color:white;padding:9px 20px;
+  font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:.4px;
+}
+.attach-page img{width:100%;display:block}
+.attach-page-iframe-wrap{width:100%;min-height:900px;position:relative}
+.attach-page-iframe-wrap iframe{width:100%;height:900px;border:none;display:block}
+.attach-page-unsupported{padding:30px;text-align:center;color:var(--muted);font-family:Arial,sans-serif;font-size:11px}
+
+/* PDF-specific: print page breaks for attachments */
+.pdf-page-break{
+  page-break-before:always;
+  break-before:page;
+  display:block;
+}
+
+/* ARIA */
+.aria-panel{position:fixed;bottom:14px;right:14px;width:320px;border-radius:8px;background:var(--white);border:1px solid var(--border);box-shadow:0 6px 26px rgba(0,0,0,.14);display:flex;flex-direction:column;overflow:hidden;transition:height .25s ease;z-index:9999}
+.aria-collapsed{height:44px}
+.aria-expanded{height:460px}
+.aria-header{background:var(--navy);padding:10px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+.aria-logo{width:24px;height:24px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--navy);flex-shrink:0}
+.aria-header-name{font-size:13px;font-weight:700;color:white;flex:1}
+.aria-toggle{color:rgba(255,255,255,.8);font-size:13px}
+.aria-messages{flex:1;overflow-y:auto;padding:9px 10px;display:flex;flex-direction:column;gap:7px;background:#f5f3ef}
+.aria-msg{max-width:88%;padding:7px 10px;border-radius:9px;font-size:11px;line-height:1.55}
+.aria-msg.bot{background:var(--white);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-radius:2px 9px 9px 9px}
+.aria-msg.user{background:var(--navy);color:white;align-self:flex-end;border-radius:9px 9px 2px 9px}
+.aria-msg.typing{opacity:.6}
+.aria-chips{display:flex;gap:4px;flex-wrap:wrap;padding:5px 10px;background:#f5f3ef;border-top:1px solid var(--border)}
+.aria-chip{font-size:10px;padding:3px 8px;background:var(--light-gold);border:none;border-radius:9px;cursor:pointer;font-family:Arial,sans-serif;color:var(--navy);font-weight:700}
+.aria-chip:hover{background:#e8d098}
+.aria-input-row{display:flex;gap:5px;padding:7px 9px;border-top:1px solid var(--border);flex-shrink:0;background:white}
+.aria-input{flex:1;border:1px solid var(--border);border-radius:12px;padding:5px 10px;font-family:Arial,sans-serif;font-size:11px;background:var(--cream)}
+.aria-input:focus{outline:none;border-color:var(--navy)}
+.aria-send{background:var(--navy);border:none;border-radius:12px;padding:5px 11px;color:white;font-size:11px;font-weight:700;cursor:pointer}
+.aria-send:hover{opacity:.85}
+
+/* PDF progress overlay */
+.pdf-overlay{position:fixed;inset:0;background:rgba(26,45,79,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;gap:14px}
+.pdf-overlay p{color:white;font-family:Arial,sans-serif;font-size:13px;font-weight:700}
+.pdf-spinner{width:38px;height:38px;border:4px solid rgba(255,255,255,.25);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo-mark">
+        <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="19" fill="#c8973a"/>
+          <rect x="8" y="11" width="24" height="18" rx="2" fill="#1a2d4f"/>
+          <rect x="11" y="14.5" width="9" height="1.5" rx=".75" fill="white" opacity=".85"/>
+          <rect x="11" y="17.5" width="15" height="1.5" rx=".75" fill="white" opacity=".85"/>
+          <rect x="11" y="20.5" width="12" height="1.5" rx=".75" fill="white" opacity=".85"/>
+          <rect x="11" y="23.5" width="7" height="1.5" rx=".75" fill="white" opacity=".85"/>
+          <circle cx="29" cy="29" r="6.5" fill="#c8973a" stroke="white" stroke-width="1.5"/>
+          <text x="29" y="32.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1a2d4f" font-family="Arial,sans-serif">A</text>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>AVRA</h1>
+        <p>Automated Validation Report Assistant</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-outline btn-sm" onclick="resetForm()">↺ Reset</button>
+      <button class="btn btn-primary btn-sm" onclick="downloadPDF()">⬇ Download PDF</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="db-strip">
+        <div class="db-strip-title">🔍 Household Lookup</div>
+        <div class="db-strip-row">
+          <input type="text" id="hhid-search" placeholder="Enter Household ID..." onkeydown="if(event.key==='Enter')searchHH()">
+          <button class="btn btn-primary btn-sm" onclick="searchHH()">Search</button>
+        </div>
+        <div class="db-status" id="db-status">Loading roster data, please wait…</div>
+        <div id="db-loaded-info" style="font-size:10px;color:var(--success);margin-top:4px;font-weight:700;display:none"></div>
+      </div>
+
+      <div class="section-nav">
+        <p>Sections</p>
+        <div class="nav-step active" onclick="showPanel(0)" id="nav0"><div class="dot">1</div> Household Profile</div>
+        <div class="nav-step" onclick="showPanel(1)" id="nav1"><div class="dot">2</div> Family Composition</div>
+        <div class="nav-step" onclick="showPanel(2)" id="nav2"><div class="dot">3</div> Findings</div>
+        <div class="nav-step" onclick="showPanel(3)" id="nav3"><div class="dot">4</div> Assessment</div>
+        <div class="nav-step" onclick="showPanel(4)" id="nav4"><div class="dot">5</div> Recommendation</div>
+        <div class="nav-step" onclick="showPanel(5)" id="nav5"><div class="dot">6</div> Signatories</div>
+        <div class="nav-step" onclick="showPanel(6)" id="nav6"><div class="dot">📎</div> Attachments</div>
+      </div>
+
+      <div class="form-panels">
+        <!-- Panel 0: Household Profile -->
+        <div class="form-panel active" id="panel0">
+          <h3>Household Profile</h3>
+          <div class="field"><label>Household ID Number</label><input type="text" id="hhid" placeholder="Auto-filled from search" oninput="updatePreview()"></div>
+          <div class="field"><label>Date</label><input type="date" id="repdate" oninput="updatePreview()"></div>
+          <div class="field"><label>Grantee's Name</label><input type="text" id="grantee" placeholder="Auto-filled from search" oninput="updatePreview()"></div>
+          <div class="field"><label>Present Address</label><input type="text" id="address" placeholder="Auto-filled from search" oninput="updatePreview()"></div>
+          <div class="field-row">
+            <div class="field"><label>Client Status</label><input type="text" id="clientstatus" placeholder="Auto-filled" oninput="updatePreview()"></div>
+            <div class="field"><label>HH Set</label><input type="text" id="hhset" placeholder="Auto-filled" oninput="updatePreview()"></div>
+          </div>
+          <div class="field"><label>Contact Number</label><input type="text" id="contact" placeholder="Not Shared" oninput="updatePreview()"></div>
+        </div>
+
+        <!-- Panel 1: Family Composition -->
+        <div class="form-panel" id="panel1">
+          <h3>Family Composition</h3>
+          <div id="members-container"></div>
+          <button class="add-member-btn" onclick="addMember()">+ Add Member</button>
+        </div>
+
+        <!-- Panel 2: Findings -->
+        <div class="form-panel" id="panel2">
+          <h3>Findings</h3>
+          <div class="field"><label>Findings / Observations</label><textarea id="findings" rows="10" placeholder="Describe the findings from the validation visit..." oninput="updatePreview()"></textarea></div>
+          <button class="chip-assist" onclick="openARIA('Please polish and improve my Findings draft: '+document.getElementById('findings').value)">✨ Polish with ARIA</button>
+        </div>
+
+        <!-- Panel 3: Assessment -->
+        <div class="form-panel" id="panel3">
+          <h3>Assessment</h3>
+          <div class="field"><label>Assessment / Evaluation</label><textarea id="assessment" rows="10" placeholder="Provide your assessment based on documents and validation..." oninput="updatePreview()"></textarea></div>
+          <button class="chip-assist" onclick="openARIA('Please polish and improve my Assessment draft: '+document.getElementById('assessment').value)">✨ Polish with ARIA</button>
+        </div>
+
+        <!-- Panel 4: Recommendation -->
+        <div class="form-panel" id="panel4">
+          <h3>Recommendation</h3>
+          <div class="field"><label>Recommendation</label><textarea id="recommendation" rows="10" placeholder="State your recommendation for the household's grant status..." oninput="updatePreview()"></textarea></div>
+          <button class="chip-assist" onclick="openARIA('Please polish and improve my Recommendation draft: '+document.getElementById('recommendation').value)">✨ Polish with ARIA</button>
+        </div>
+
+        <!-- Panel 5: Signatories -->
+        <div class="form-panel" id="panel5">
+          <h3>Signatories</h3>
+          <div class="field"><label>Prepared by — Name</label><input type="text" id="prepname" placeholder="Full name" oninput="updatePreview()"></div>
+          <div class="field"><label>Prepared by — Position</label><input type="text" id="preppos" placeholder="e.g. Project Development Officer II" oninput="updatePreview()"></div>
+          <div class="field" style="margin-top:12px"><label>Reviewed and Noted by — Name</label><input type="text" id="revname" placeholder="Full name" oninput="updatePreview()"></div>
+          <div class="field"><label>Reviewed and Noted by — Position</label><input type="text" id="revpos" placeholder="e.g. Social Welfare Officer III" oninput="updatePreview()"></div>
+          <div style="margin-top:14px"><button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;font-size:12px" onclick="downloadPDF()">⬇ Generate & Download PDF</button></div>
+        </div>
+
+        <!-- Panel 6: Attachments -->
+        <div class="form-panel" id="panel6">
+          <h3>📎 Attachments <span style="font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(Optional)</span></h3>
+          <div class="attach-note">
+            <strong>ℹ️ How attachments work:</strong><br>
+            Attached files will be added as <strong>separate pages</strong> after the Validation Report in the generated PDF — they are <em>not</em> part of the report itself. This creates a complete package document for reference.<br><br>
+            Supported: <strong>PDF, PNG, JPG, GIF, WebP</strong>. Each file becomes its own section.
+          </div>
+          <div style="margin-top:10px" class="attach-zone" id="attach-zone">
+            <strong>📂 Click to add attachment files</strong>
+            <p>PDF or image files (you can select multiple)</p>
+            <input type="file" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" multiple onchange="handleAttachments(this)">
+          </div>
+          <div class="attach-list" id="attach-list"></div>
+          <div id="attach-count-msg" style="font-size:10px;color:var(--muted);margin-top:6px;display:none"></div>
+        </div>
+      </div>
+
+      <div class="panel-footer">
+        <button class="panel-nav-btn" id="prevBtn" onclick="prevPanel()" style="display:none">← Back</button>
+        <button class="panel-nav-btn next" id="nextBtn" onclick="nextPanel()">Next →</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANE -->
+    <div class="preview-pane">
+      <!-- Main report -->
+      <div id="report-content" class="report-wrapper">
+        <div class="report-header">
+          <h2>V A L I D A T I O N &nbsp;&nbsp; R E P O R T</h2>
+        </div>
+        <div class="report-body">
+          <div class="rpt-section-title">Household Profile Summary</div>
+          <div class="rpt-grid">
+            <div>
+              <div class="rpt-label">Household ID Number</div>
+              <div class="rpt-value" id="pv-hhid"><span class="ph">—</span></div>
+            </div>
+            <div>
+              <div class="rpt-label">Date</div>
+              <div class="rpt-value" id="pv-date"><span class="ph">—</span></div>
+            </div>
+            <div>
+              <div class="rpt-label">Grantee's Name</div>
+              <div class="rpt-value" id="pv-grantee"><span class="ph">—</span></div>
+            </div>
+            <div>
+              <div class="rpt-label">Present Address</div>
+              <div class="rpt-value" id="pv-address"><span class="ph">—</span></div>
+            </div>
+            <div>
+              <div class="rpt-label">Client Status | HH Set</div>
+              <div class="rpt-value" id="pv-status"><span class="ph">—</span></div>
+            </div>
+            <div>
+              <div class="rpt-label">Contact Number</div>
+              <div class="rpt-value" id="pv-contact"><span class="ph">—</span></div>
+            </div>
+          </div>
+
+          <div class="rpt-section-title">Family Composition</div>
+          <table class="rpt-table">
+            <thead><tr>
+              <th style="width:13%">Entry ID</th>
+              <th style="width:28%">Name</th>
+              <th style="width:17%">Relationship</th>
+              <th style="width:14%">Birthdate</th>
+              <th style="width:6%">Age</th>
+              <th style="width:22%">Status</th>
+            </tr></thead>
+            <tbody id="pv-members-body">
+              <tr><td colspan="6" style="text-align:center;color:#aaa;font-style:italic;padding:10px">No members loaded yet</td></tr>
+            </tbody>
+          </table>
+
+          <div class="rpt-section-title">Findings</div>
+          <div class="rpt-text-box" id="pv-findings"><span class="ph">Findings will appear here...</span></div>
+
+          <div class="rpt-section-title">Assessment</div>
+          <div class="rpt-text-box" id="pv-assessment"><span class="ph">Assessment will appear here...</span></div>
+
+          <div class="rpt-section-title">Recommendation</div>
+          <div class="rpt-text-box" id="pv-recommendation"><span class="ph">Recommendation will appear here...</span></div>
+
+          <div class="rpt-sig-row">
+            <div>
+              <div class="rpt-sig-label">Prepared by:</div>
+              <div class="rpt-sig-line"></div>
+              <div class="rpt-sig-name" id="pv-prepname"><span class="ph">Name of Preparer</span></div>
+              <div class="rpt-sig-position" id="pv-preppos"><span class="ph">Position</span></div>
+            </div>
+            <div>
+              <div class="rpt-sig-label">Reviewed and Noted by:</div>
+              <div class="rpt-sig-line"></div>
+              <div class="rpt-sig-name" id="pv-revname"><span class="ph">Reviewing Officer</span></div>
+              <div class="rpt-sig-position" id="pv-revpos"><span class="ph">Position</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attachment previews (shown dynamically) -->
+      <div id="attach-previews-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ARIA -->
+<div class="aria-panel aria-collapsed" id="aria-panel">
+  <div class="aria-header" onclick="toggleARIA()">
+    <div class="aria-logo">A</div>
+    <div class="aria-header-name">ARIA</div>
+    <span class="aria-toggle" id="aria-toggle">▲</span>
+  </div>
+  <div class="aria-messages" id="aria-messages">
+    <div class="aria-msg bot">🌟 Hi! I'm <strong>ARIA</strong>, your AI writing assistant.<br><br>I specialize in <strong>polishing your drafts</strong> — paste your rough Findings, Assessment, or Recommendation and I'll improve the grammar, clarity, and professional tone while keeping your original observations intact.<br><br>You can also give me bullet points or key notes and I'll write a full paragraph for you. Use the quick buttons below to get started!</div>
+  </div>
+  <div class="aria-chips">
+    <button class="aria-chip" onclick="sendQuick('Please polish and improve my Findings draft: '+document.getElementById('findings').value)">✨ Polish Findings</button>
+    <button class="aria-chip" onclick="sendQuick('Please polish and improve my Assessment draft: '+document.getElementById('assessment').value)">✨ Polish Assessment</button>
+    <button class="aria-chip" onclick="sendQuick('Please polish and improve my Recommendation draft: '+document.getElementById('recommendation').value)">✨ Polish Recommendation</button>
+    <button class="aria-chip" onclick="sendQuick('Help me write the Findings section from scratch')">📝 Write Findings</button>
+  </div>
+  <div class="aria-input-row">
+    <input type="text" class="aria-input" id="aria-input" placeholder="Type your message..." onkeydown="if(event.key==='Enter')sendARIA()">
+    <button class="aria-send" onclick="sendARIA()">Send</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+const F={REGION:0,PROVINCE:1,MUNICIPALITY:2,BARANGAY:3,HH_ID:4,ENTRY_ID:5,FIRST_NAME:6,MIDDLE_NAME:7,LAST_NAME:8,EXT_NAME:9,BIRTHDAY:10,AGE:11,CLIENT_STATUS:14,MEMBER_STATUS:16,RELATION:17,GRANTEE:19,HH_SET:20};
+let dbHouseholds={},currentPanel=0,memberCount=0,ariaOpen=false,ariaHistory=[];
+
+// Attachment storage: [{name, size, type, dataUrl}]
+let attachments=[];
+
+/* ===== PANEL NAVIGATION ===== */
+function showPanel(i){
+  const totalPanels=7;
+  document.querySelectorAll('.form-panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-step').forEach((n,j)=>n.classList.toggle('active',j===i));
+  currentPanel=i;
+  document.getElementById('prevBtn').style.display=i===0?'none':'inline-flex';
+  document.getElementById('nextBtn').style.display=i===(totalPanels-1)?'none':'inline-flex';
+}
+function nextPanel(){if(currentPanel<6)showPanel(currentPanel+1)}
+function prevPanel(){if(currentPanel>0)showPanel(currentPanel-1)}
+function v(id){return(document.getElementById(id)||{}).value||''}
+function setVal(id,val){const el=document.getElementById(id);if(el&&val!=null)el.value=val;}
+function setStatus(msg,cls){const el=document.getElementById('db-status');el.textContent=msg;el.className='db-status'+(cls?' '+cls:'');}
+
+function pv(id,val,ph){
+  const el=document.getElementById(id);if(!el)return;
+  el.innerHTML=val&&String(val).trim()?String(val):`<span class="ph">${ph||'—'}</span>`;
+}
+
+/* ===== JSON AUTO-FETCH ===== */
+function initDB(){
+  setStatus('Loading roster data…','');
+  fetch('roster.json.gz')
+    .then(r=>{
+      if(!r.ok)throw new Error('roster.json.gz not found (HTTP '+r.status+')');
+      const ds=new DecompressionStream('gzip');
+      const decompressed=r.body.pipeThrough(ds);
+      return new Response(decompressed).text();
+    })
+    .then(text=>{
+      const data=JSON.parse(text);
+      if(!data.households)throw new Error('Invalid roster schema');
+      dbHouseholds=data.households;
+      const cnt=Object.keys(dbHouseholds).length;
+      document.getElementById('db-loaded-info').textContent='✓ Roster loaded — '+cnt.toLocaleString()+' households ready';
+      document.getElementById('db-loaded-info').style.display='block';
+      setStatus('✓ Database ready. Search by Household ID above.','ok');
+    })
+    .catch(err=>{
+      console.warn('Auto-fetch failed:',err.message);
+      setStatus('⚠ Could not load roster automatically.','err');
+    });
+}
+
+function searchHH(){
+  const q=v('hhid-search').trim();
+  if(!q){setStatus('Please enter a Household ID.','');return}
+  if(!Object.keys(dbHouseholds).length){setStatus('No database loaded. Please import your JSON file first.','err');return}
+  let key=Object.keys(dbHouseholds).find(k=>k===q)||Object.keys(dbHouseholds).find(k=>k.includes(q)||q.includes(k));
+  if(!key){setStatus(`No record found for "${q}".`,'err');return}
+  const members=dbHouseholds[key];
+  if(!members||!members.length){setStatus('Record found but has no members.','err');return}
+  fillHouseholdProfile(key,members);
+  fillFamilyMembers(members);
+  updatePreview();
+  setStatus(`✓ Loaded: ${key} — ${members.length} member(s).`,'ok');
+  showPanel(0);
+}
+
+function fillHouseholdProfile(hhid,members){
+  setVal('hhid',hhid);
+  const gr=members.find(m=>String(m[F.GRANTEE]).toUpperCase()==='YES')||members[0];
+  const fn=gr[F.FIRST_NAME]||'',mn=gr[F.MIDDLE_NAME]||'',ln=gr[F.LAST_NAME]||'',ext=gr[F.EXT_NAME]||'';
+  const nm=`${ln}, ${fn}${mn?' '+mn:''}${ext?' '+ext:''}`.toUpperCase().replace(/,\s*$/,'');
+  setVal('grantee',nm);
+  setVal('address',[gr[F.BARANGAY],gr[F.MUNICIPALITY],gr[F.PROVINCE]].filter(Boolean).join(', '));
+  setVal('clientstatus',gr[F.CLIENT_STATUS]||'');
+  setVal('hhset',gr[F.HH_SET]||'');
+  if(!v('contact'))setVal('contact','Not Shared');
+}
+
+function fillFamilyMembers(members){
+  document.getElementById('members-container').innerHTML='';memberCount=0;
+  members.forEach(m=>{
+    memberCount++;const id='m'+memberCount;
+    const div=document.createElement('div');div.className='member-card';div.id='mc'+id;
+    const fn=m[F.FIRST_NAME]||'',mn=m[F.MIDDLE_NAME]||'',ln=m[F.LAST_NAME]||'',ext=m[F.EXT_NAME]||'';
+    const nm=`${ln}, ${fn}${mn?' '+mn:''}${ext?' '+ext:''}`.toUpperCase().replace(/,\s*$/,'');
+    div.innerHTML=`<div class="member-num">Member ${memberCount}</div>
+    <button class="remove-btn" onclick="removeMember('${id}')" aria-label="Remove">×</button>
+    <div class="field-row">
+      <div class="field"><label>Entry ID</label><input type="text" id="eid${id}" value="${m[F.ENTRY_ID]||''}" oninput="updatePreview()"></div>
+      <div class="field"><label>Relationship</label><input type="text" id="rel${id}" value="${m[F.RELATION]||''}" oninput="updatePreview()"></div>
+    </div>
+    <div class="field"><label>Name</label><input type="text" id="nm${id}" value="${nm}" oninput="updatePreview()"></div>
+    <div class="field-row">
+      <div class="field"><label>Birthdate</label><input type="text" id="bd${id}" value="${m[F.BIRTHDAY]||''}" oninput="updatePreview()"></div>
+      <div class="field"><label>Age</label><input type="text" id="ag${id}" value="${m[F.AGE]||''}" oninput="updatePreview()"></div>
+    </div>
+    <div class="field"><label>Member Status</label><input type="text" id="st${id}" value="${m[F.MEMBER_STATUS]||''}" oninput="updatePreview()"></div>`;
+    document.getElementById('members-container').appendChild(div);
+  });
+}
+
+function addMember(){
+  memberCount++;const id='m'+memberCount;
+  const div=document.createElement('div');div.className='member-card';div.id='mc'+id;
+  div.innerHTML=`<div class="member-num">Member ${memberCount}</div>
+  <button class="remove-btn" onclick="removeMember('${id}')" aria-label="Remove">×</button>
+  <div class="field-row">
+    <div class="field"><label>Entry ID</label><input type="text" id="eid${id}" placeholder="Entry ID" oninput="updatePreview()"></div>
+    <div class="field"><label>Relationship</label><select id="rel${id}" onchange="updatePreview()">
+      <option value="">Select</option><option>Head</option><option>Wife / Spouse</option>
+      <option>Son / Daughter</option><option>Parent</option><option>Sibling</option>
+      <option>Grandson / Granddaughter</option><option>Son-in-law / Daughter-in-law</option><option>Other Relatives</option>
+    </select></div>
+  </div>
+  <div class="field"><label>Name</label><input type="text" id="nm${id}" placeholder="LAST, FIRST MIDDLE" oninput="updatePreview()"></div>
+  <div class="field-row">
+    <div class="field"><label>Birthdate</label><input type="date" id="bd${id}" oninput="updateBD('${id}')"></div>
+    <div class="field"><label>Age</label><input type="text" id="ag${id}" readonly style="background:#efefef"></div>
+  </div>
+  <div class="field"><label>Member Status</label><select id="st${id}" onchange="updatePreview()">
+    <option value="">Select</option><option value="1 - Active">1 - Active</option>
+    <option value="2 - Deceased">2 - Deceased</option><option value="3 - Moved Out">3 - Moved Out</option>
+  </select></div>`;
+  document.getElementById('members-container').appendChild(div);
+}
+function updateBD(id){const bd=document.getElementById('bd'+id).value;if(bd)document.getElementById('ag'+id).value=Math.floor((new Date()-new Date(bd))/(365.25*24*60*60*1000));updatePreview();}
+function removeMember(id){document.getElementById('mc'+id)?.remove();updatePreview();}
+
+/* ===== PREVIEW UPDATE ===== */
+function updatePreview(){
+  pv('pv-hhid',v('hhid'));
+  const d=v('repdate');
+  pv('pv-date',d?new Date(d+'T00:00:00').toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'}):'');
+  pv('pv-grantee',(v('grantee')||'').toUpperCase());
+  pv('pv-address',v('address'));
+  const cs=v('clientstatus'),hs=v('hhset');
+  pv('pv-status',cs||hs?`${cs||'—'} | ${hs||'—'}`:'');
+  pv('pv-contact',v('contact'));
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  pv('pv-findings',v('findings')?esc(v('findings')):'','Findings will appear here...');
+  pv('pv-assessment',v('assessment')?esc(v('assessment')):'','Assessment will appear here...');
+  pv('pv-recommendation',v('recommendation')?esc(v('recommendation')):'','Recommendation will appear here...');
+  const pn=(v('prepname')||'').toUpperCase();
+  document.getElementById('pv-prepname').innerHTML=pn||'<span class="ph">Name of Preparer</span>';
+  document.getElementById('pv-preppos').innerHTML=v('preppos')||'<span class="ph">Position</span>';
+  const rn=(v('revname')||'').toUpperCase();
+  document.getElementById('pv-revname').innerHTML=rn||'<span class="ph">Reviewing Officer</span>';
+  document.getElementById('pv-revpos').innerHTML=v('revpos')||'<span class="ph">Position</span>';
+  updateMembersPreview();
+}
+
+function updateMembersPreview(){
+  const tbody=document.getElementById('pv-members-body');
+  const cards=document.querySelectorAll('.member-card');
+  if(!cards.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:#aaa;font-style:italic;padding:10px">No members loaded yet</td></tr>';return;}
+  tbody.innerHTML='';
+  cards.forEach(c=>{
+    const id=c.id.replace('mc','');
+    const st=(document.getElementById('st'+id)||{}).value||'—';
+    const sc=st.includes('Active')?'badge-active':st.includes('Moved')||st.includes('Deceased')?'badge-movout':'badge-inactive';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${(document.getElementById('eid'+id)||{}).value||'—'}</td>
+    <td>${(document.getElementById('nm'+id)||{}).value||'—'}</td>
+    <td>${(document.getElementById('rel'+id)||{}).value||'—'}</td>
+    <td>${(document.getElementById('bd'+id)||{}).value||'—'}</td>
+    <td>${(document.getElementById('ag'+id)||{}).value||'—'}</td>
+    <td><span class="badge-status ${sc}">${st}</span></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ===== RESET ===== */
+function resetForm(){
+  if(!confirm('Reset all fields? This cannot be undone.'))return;
+  ['hhid','repdate','grantee','address','clientstatus','hhset','contact','findings','assessment','recommendation','prepname','preppos','revname','revpos'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('members-container').innerHTML='';memberCount=0;
+  attachments=[];renderAttachmentList();renderAttachmentPreviews();
+  updatePreview();showPanel(0);
+}
+
+/* ===== ATTACHMENTS ===== */
+function handleAttachments(input){
+  const files=Array.from(input.files);
+  if(!files.length)return;
+  let loaded=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      attachments.push({name:file.name,size:file.size,type:file.type,dataUrl:e.target.result});
+      loaded++;
+      if(loaded===files.length){renderAttachmentList();renderAttachmentPreviews();}
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value='';// reset so same file can be re-added if needed
+}
+
+function removeAttachment(idx){
+  attachments.splice(idx,1);
+  renderAttachmentList();
+  renderAttachmentPreviews();
+}
+
+function fmtSize(bytes){
+  if(bytes<1024)return bytes+'B';
+  if(bytes<1048576)return (bytes/1024).toFixed(1)+'KB';
+  return (bytes/1048576).toFixed(1)+'MB';
+}
+
+function renderAttachmentList(){
+  const list=document.getElementById('attach-list');
+  const msg=document.getElementById('attach-count-msg');
+  list.innerHTML='';
+  if(!attachments.length){msg.style.display='none';return;}
+  msg.style.display='block';
+  msg.textContent=`${attachments.length} attachment(s) will be appended after the Validation Report.`;
+  attachments.forEach((a,i)=>{
+    const item=document.createElement('div');
+    item.className='attach-item';
+    const icon=a.type==='application/pdf'?'📄':a.type.startsWith('image/')? '🖼️':'📎';
+    item.innerHTML=`<span style="font-size:15px">${icon}</span>
+      <span class="attach-item-name" title="${a.name}">${a.name}</span>
+      <span class="attach-item-size">${fmtSize(a.size)}</span>
+      <button class="attach-remove" onclick="removeAttachment(${i})" title="Remove">×</button>`;
+    list.appendChild(item);
+  });
+}
+
+function renderAttachmentPreviews(){
+  const wrap=document.getElementById('attach-previews-wrap');
+  wrap.innerHTML='';
+  if(!attachments.length)return;
+  attachments.forEach((a,i)=>{
+    // Separator label
+    const sep=document.createElement('div');
+    sep.className='attach-page-separator';
+    sep.innerHTML=`<span style="color:var(--navy);font-weight:700">📎 Attachment ${i+1}:</span> <span>${a.name}</span>`;
+    wrap.appendChild(sep);
+    // Attachment page
+    const page=document.createElement('div');
+    page.className='attach-page';
+    page.innerHTML=`<div class="attach-page-header">ATTACHMENT ${i+1} — ${a.name.toUpperCase()}</div>`;
+    if(a.type.startsWith('image/')){
+      const img=document.createElement('img');
+      img.src=a.dataUrl;img.alt=a.name;
+      page.appendChild(img);
+    } else if(a.type==='application/pdf'){
+      // Show embedded PDF viewer
+      const iframeWrap=document.createElement('div');
+      iframeWrap.className='attach-page-iframe-wrap';
+      const iframe=document.createElement('iframe');
+      iframe.src=a.dataUrl;
+      iframe.title=a.name;
+      iframeWrap.appendChild(iframe);
+      page.appendChild(iframeWrap);
+    } else {
+      page.innerHTML+=`<div class="attach-page-unsupported">Preview not available for this file type.</div>`;
+    }
+    wrap.appendChild(page);
+  });
+}
+
+/* ===== PDF GENERATION ===== */
+async function downloadPDF(){
+  const filename=`ValidationReport_${v('hhid')||'draft'}.pdf`;
+
+  // Show progress overlay
+  const overlay=document.createElement('div');
+  overlay.className='pdf-overlay';
+  overlay.innerHTML='<div class="pdf-spinner"></div><p>Generating PDF, please wait...</p>';
+  document.body.appendChild(overlay);
+
+  try {
+    // --- Step 1: Generate the main report ---
+    const reportEl=document.getElementById('report-content');
+    const reportOpt={
+      margin:[12,12,12,12],
+      filename,
+      image:{type:'jpeg',quality:.98},
+      html2canvas:{scale:2,useCORS:true,letterRendering:true,scrollY:0,logging:false},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
+      pagebreak:{mode:['css','legacy'],avoid:['.rpt-sig-row','.rpt-table thead']}
+    };
+
+    const worker=html2pdf().set(reportOpt).from(reportEl);
+    let pdf=await worker.toPdf().get('pdf');
+
+    // --- Step 2: Append each attachment ---
+    if(attachments.length>0){
+      const {jsPDF}=window.jspdf||{};
+      // html2pdf bundles jsPDF; access it via the pdf object
+      for(let i=0;i<attachments.length;i++){
+        const a=attachments[i];
+        pdf.addPage('a4','portrait');
+
+        // Draw a header bar for the attachment
+        pdf.setFillColor(26,45,79); // navy
+        pdf.rect(0,0,210,14,'F');
+        pdf.setTextColor(255,255,255);
+        pdf.setFont('helvetica','bold');
+        pdf.setFontSize(9);
+        pdf.text(`ATTACHMENT ${i+1} — ${a.name}`,10,9);
+        pdf.setTextColor(0,0,0);
+
+        if(a.type.startsWith('image/')){
+          // Draw image on page
+          const imgProps=await getImageDimensions(a.dataUrl);
+          const pageW=210-24; // margins
+          const pageH=297-24-14;
+          let imgW=pageW,imgH=(imgProps.h/imgProps.w)*imgW;
+          if(imgH>pageH){imgH=pageH;imgW=(imgProps.w/imgProps.h)*imgH;}
+          const imgX=12+(pageW-imgW)/2;
+          pdf.addImage(a.dataUrl,a.type.includes('png')?'PNG':'JPEG',imgX,18,imgW,imgH);
+        } else if(a.type==='application/pdf'){
+          // Render PDF pages using an offscreen canvas approach
+          overlay.querySelector('p').textContent=`Processing attachment ${i+1} of ${attachments.length}...`;
+          await appendPdfPages(pdf,a.dataUrl);
+        }
+      }
+    }
+
+    // --- Step 3: Save ---
+    pdf.save(filename);
+  } catch(err){
+    console.error('PDF error:',err);
+    alert('PDF generation failed. Please try again.\n\n'+err.message);
+  } finally {
+    overlay.remove();
+  }
+}
+
+function getImageDimensions(dataUrl){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>resolve({w:img.naturalWidth,h:img.naturalHeight});
+    img.src=dataUrl;
+  });
+}
+
+// Render PDF pages into the jsPDF object using pdf.js (bundled in most browsers or via CDN)
+async function appendPdfPages(pdf,pdfDataUrl){
+  // Dynamically load pdf.js if not already available
+  if(!window.pdfjsLib){
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+
+  const pdfDoc=await window.pdfjsLib.getDocument(pdfDataUrl).promise;
+  const numPages=pdfDoc.numPages;
+
+  for(let pageNum=1;pageNum<=numPages;pageNum++){
+    if(pageNum>1) pdf.addPage('a4','portrait');
+    // Draw attachment header only on first page (already added)
+    if(pageNum>1){
+      pdf.setFillColor(26,45,79);
+      pdf.rect(0,0,210,14,'F');
+      pdf.setTextColor(255,255,255);
+      pdf.setFont('helvetica','bold');
+      pdf.setFontSize(9);
+      pdf.text(`(continued — page ${pageNum})`,10,9);
+      pdf.setTextColor(0,0,0);
+    }
+
+    const page=await pdfDoc.getPage(pageNum);
+    const viewport=page.getViewport({scale:2.0});
+    const canvas=document.createElement('canvas');
+    canvas.width=viewport.width;
+    canvas.height=viewport.height;
+    const ctx=canvas.getContext('2d');
+    await page.render({canvasContext:ctx,viewport}).promise;
+
+    const imgData=canvas.toDataURL('image/jpeg',0.95);
+    const pageW=210-24;
+    const pageH=297-14-14;
+    const scaleW=pageW;
+    const scaleH=(canvas.height/canvas.width)*scaleW;
+    const finalH=Math.min(scaleH,pageH);
+    const finalW=(finalH/scaleH)*scaleW;
+    const xOff=12+(pageW-finalW)/2;
+    pdf.addImage(imgData,'JPEG',xOff,16,finalW,finalH);
+  }
+}
+
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    if(document.querySelector(`script[src="${src}"]`)){resolve();return;}
+    const s=document.createElement('script');
+    s.src=src;s.onload=resolve;s.onerror=reject;
+    document.head.appendChild(s);
+  });
+}
+
+/* ===== ARIA ===== */
+function toggleARIA(){
+  ariaOpen=!ariaOpen;
+  const p=document.getElementById('aria-panel');
+  p.classList.toggle('aria-expanded',ariaOpen);
+  p.classList.toggle('aria-collapsed',!ariaOpen);
+  document.getElementById('aria-toggle').textContent=ariaOpen?'▼':'▲';
+  if(ariaOpen)setTimeout(()=>document.getElementById('aria-input').focus(),280);
+}
+function openARIA(msg){if(!ariaOpen)toggleARIA();setTimeout(()=>{document.getElementById('aria-input').value=msg;sendARIA();},420);}
+function sendQuick(msg){if(!ariaOpen)toggleARIA();setTimeout(()=>{document.getElementById('aria-input').value=msg;sendARIA();},120);}
+function appendMsg(text,role){
+  const div=document.createElement('div');div.className='aria-msg '+role;div.innerHTML=text;
+  const msgs=document.getElementById('aria-messages');msgs.appendChild(div);msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+const ARIA_PROXY = 'https://sparkling-sound-5536.resmairish.workers.dev';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+
+async function sendARIA(){
+  const input=document.getElementById('aria-input');
+  const msg=input.value.trim();if(!msg)return;
+  input.value='';appendMsg(msg,'user');
+  const typing=appendMsg('<em>ARIA is writing...</em>','bot typing');
+
+  const ctx=[];
+  if(v('hhid'))ctx.push('Household ID: '+v('hhid'));
+  if(v('grantee'))ctx.push('Grantee: '+v('grantee'));
+  if(v('clientstatus'))ctx.push('Client Status: '+v('clientstatus'));
+  if(v('address'))ctx.push('Address: '+v('address'));
+  if(v('findings'))ctx.push('Current Findings draft: '+v('findings'));
+  if(v('assessment'))ctx.push('Current Assessment draft: '+v('assessment'));
+  if(v('recommendation'))ctx.push('Current Recommendation draft: '+v('recommendation'));
+
+  const systemPrompt =
+    'You are ARIA, an expert AI writing assistant embedded in AVRA (Automated Validation Report Assistant), '+
+    'used by Philippine DSWD (Department of Social Welfare and Development) field officers and social workers.\n\n'+
+    'Your PRIMARY role is to help staff IMPROVE and POLISH their existing drafts — not just write from scratch. '+
+    'When a user shares a draft, always work WITH it: preserve their observations and intent while improving grammar, clarity, structure, and professionalism.\n\n'+
+    'Capabilities:\n'+
+    '1. POLISH/IMPROVE DRAFT — When given a draft, rewrite it with better grammar, flow, and formal tone. Show the improved version in a clearly labeled block.\n'+
+    '2. WRITE FROM SCRATCH — When given key points or bullet notes, turn them into a full professional paragraph.\n'+
+    '3. EXPLAIN CHANGES — Briefly note what you improved and why, so the user learns.\n'+
+    '4. SUGGEST CONTENT — When asked, suggest what to include in a section based on context.\n\n'+
+    'Writing style:\n'+
+    '- Formal, third-person, objective Philippine government report style\n'+
+    '- Concise but complete — typically 3–6 sentences per section\n'+
+    '- Use proper DSWD and 4Ps terminology: grantee, beneficiary household, compliance, grant status, CS1-Active, CS19-Temporarily On Hold, 4Ps Program, Pantawid Pamilyang Pilipino Program, household validation\n'+
+    '- Always present the final polished text in a clearly labeled block so the user can copy-paste directly into the form\n'+
+    '- Never refuse to help with a draft — always attempt to improve whatever is given\n'+
+    '- Avoid filler phrases; every sentence must add meaning'+
+    (ctx.length ? '\n\nCurrent form context (use this to make responses more specific and accurate):\n'+ctx.join('\n') : '');
+
+  // Build Groq/OpenAI-compatible messages array
+  ariaHistory.push({role:'user',content:msg});
+  const messages = [
+    {role:'system', content: systemPrompt},
+    ...ariaHistory.slice(-14)
+  ];
+
+  try{
+    const res = await fetch(
+      ARIA_PROXY,
+      {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model: GROQ_MODEL,
+          messages,
+          max_tokens: 1000,
+          temperature: 0.7
+        })
+      }
+    );
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      typing.remove();
+      appendMsg(`Connection error (${res.status}): ${err.error?.message||'Please try again.'}`,'bot');
+      ariaHistory.pop();return;
+    }
+    const data=await res.json();
+    const reply=(data.choices?.[0]?.message?.content||'').trim();
+    typing.remove();
+    if(reply){ariaHistory.push({role:'assistant',content:reply});appendMsg(reply.replace(/\n/g,'<br>'),'bot');}
+    else{appendMsg('ARIA received an empty response. Please try again.','bot');ariaHistory.pop();}
+  }catch(e){
+    typing.remove();
+    appendMsg('Unable to connect. Please check your internet connection and try again.','bot');
+    ariaHistory.pop();console.error('ARIA error:',e);
+  }
+}
+
+/* ===== INIT ===== */
+updatePreview();
+document.getElementById('repdate').value=new Date().toISOString().split('T')[0];
+updatePreview();
+initDB();
+</script>
